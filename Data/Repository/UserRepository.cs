@@ -4,9 +4,10 @@ using AspProfile.Models;
 
 namespace AspProfile.Data.Repository;
 
-public class UserRepository(UserManager<User> manager) : IUserRepository
+public class UserRepository(UserManager<User> manager, SignInManager<User> signManager) : IUserRepository
 {
     private readonly UserManager<User> _manager = manager;
+    private readonly SignInManager<User> _signManager = signManager;
 
     public async Task<Result<bool>> CreateUserAsync(UserCreateDTO user)
     {
@@ -29,9 +30,24 @@ public class UserRepository(UserManager<User> manager) : IUserRepository
         return Result<bool>.Error(result.ToString());
     }
 
-    public async Task<User> FindUserAsync(UserRequestDTO user)
+    public async Task<User> FindByEmailAsync(string email)
     {
-        return await _manager.FindByIdAsync(user.Id);
+        return await _manager.FindByEmailAsync(email);
+    }
+
+    public async Task<UserResponseDTO> FindByNameAsync(string name)
+    {
+        User user = await _manager.FindByNameAsync(name);
+        if (user == null)
+            return null;
+
+        return new UserResponseDTO
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Description = user.Description,
+            Email = user.Email
+        };
     }
 
     public async Task<Result<bool>> DeleteUserAsync(UserRequestDTO user)
@@ -47,5 +63,28 @@ public class UserRepository(UserManager<User> manager) : IUserRepository
             return Result<bool>.Success("Usuário deletado com sucesso", true);
 
         return Result<bool>.Error(result.ToString());
+    }
+
+    public async Task<Result<bool>> LoginUserAsync(UserRequestDTO user)
+    {
+        if (user.Password == null)
+            return Result<bool>.Error("Senha não informada");
+
+        User? userToLogin = await FindByEmailAsync(user.Email);
+
+        if (user == null)
+            return Result<bool>.Error("Usuário não encontrado");
+
+        var result = await _signManager.PasswordSignInAsync(userToLogin, user.Password, false, false);
+        
+        if (result.Succeeded)
+            return Result<bool>.Success("Usuário logado com sucesso", true);
+        else
+            return Result<bool>.Error(result.ToString());
+    }
+
+    public async Task SignOutAsync()
+    {
+        await _signManager.SignOutAsync();
     }
 }
