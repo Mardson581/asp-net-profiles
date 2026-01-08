@@ -5,6 +5,7 @@ using AspProfile.Models.DTO;
 
 namespace AspProfile.Controllers;
 
+[Route("/{action=Index}")]
 public class HomeController(IUserRepository repository) : Controller
 {
     private readonly IUserRepository _repository = repository;
@@ -14,17 +15,38 @@ public class HomeController(IUserRepository repository) : Controller
         if (User.Identity.IsAuthenticated)
         {
             UserResponseDTO user = await _repository.FindByNameAsync(User.Identity.Name);
-            return View(user);
+            return Ok(User.Identity.Name);
         }
-        return Ok(User.Identity.Name);
+        return NotFound("You're not logged in");
     }
 
+    [HttpGet]
+    public IActionResult Login()
+    {
+        return View();
+    }
+
+    [HttpPost]
     public async Task<IActionResult> Login(UserRequestDTO user)
     {
+        if (!ModelState.IsValid)
+        {
+            TempData["Message"] = ModelState.Values
+                                .SelectMany(v => v.Errors)
+                                .Select(e => e.ErrorMessage)
+                                .ToList()[0];
+            return View();
+        }
         var result = await _repository.LoginUserAsync(user);
-        return Ok(result.Message);
+        if (!result.IsSuccess)
+        {
+            TempData["Message"] = result.Message;
+            return View();
+        }
+        return RedirectToAction("Index");
     }
 
+    [HttpPost]
     public async Task<IActionResult> Register(UserCreateDTO user)
     {
         if (!ModelState.IsValid)
@@ -39,6 +61,7 @@ public class HomeController(IUserRepository repository) : Controller
         return RedirectToAction("Index");
     }
 
+    [HttpPost]
     public async Task<IActionResult> Logout()
     {
         await _repository.SignOutAsync();
