@@ -1,8 +1,13 @@
-<div class="text-center">
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="text-center d-flex flex-column align-items-center">
     <h1 class="display-4">Fazer Login</h1>
-    <form action="/login" method="POST">
+    <form action="/login" class="d-flex flex-column align-items-center" style="gap: 10px" method="POST">
         <input type="email" placeholder="Insira o Email" name="Email" />
         <input type="password" placeholder="Insira a Senha" name="Password" />
         <input class="btn btn-primary" type="submit" value="Login" />
+        <a href="/register">Criar conta</a>
     </form>
 </div>

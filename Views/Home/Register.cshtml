@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="text-center d-flex flex-column align-items-center">
+    <h1 class="display-4">Fazer cadastro</h1>
+    <form action="/register" class="d-flex flex-column align-items-center" style="gap: 10px" method="POST">
+        <input type="text" placeholder="Insira o primeiro nome" name="FirstName" />
+        <input type="text" placeholder="Insira o sobrenome" name="LastName" />
+        <input type="email" placeholder="Insira o Email" name="Email" />
+        <input type="password" placeholder="Insira a Senha" name="Password" />
+        <textarea placeholder="Fale sobre você" name="Description" maxlength="200" /></textarea>
+        <input class="btn btn-primary" type="submit" value="Criar conta" />
+    </form>
+</div>

@@ -71,8 +71,7 @@ public class UserRepository(UserManager<User> manager, SignInManager<User> signM
             return Result<bool>.Error("Senha não informada");
 
         User? userToLogin = await FindByEmailAsync(user.Email);
-
-        if (user == null)
+        if (userToLogin == null)
             return Result<bool>.Error("Usuário não encontrado");
 
         var result = await _signManager.PasswordSignInAsync(userToLogin, user.Password, false, false);
@@ -80,7 +79,7 @@ public class UserRepository(UserManager<User> manager, SignInManager<User> signM
         if (result.Succeeded)
             return Result<bool>.Success("Usuário logado com sucesso", true);
         else
-            return Result<bool>.Error(result.ToString());
+            return Result<bool>.Error("Email ou senha estão errados");
     }
 
     public async Task SignOutAsync()

@@ -1,10 +1,19 @@
 ﻿@model AspProfile.Models.DTO.UserResponseDTO;
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = $"Olá, {Model.FirstName}!";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center d-flex flex-column align-items-center">
+    <div class="container d-flex justify-content-space-around align-items-center">
+        <img style="height: 16em; width: 16em;" src="/images/profile.png" alt="Profile icon">
+        <div style="height: 100%; gap: 5px;" class="d-flex flex-column align-items-start justify-content-start">
+            <h2>@Model.FirstName @Model.LastName</h2>
+            <p class="mt-0 text-muted">@Model.Email</p>
+            <p class=".fs-1 text">@Model.Description</p>
+        </div>
+    </div>
 </div>
-<h1>@Model.Email</h1>
+
+<form action="/logout" method="POST" style="position: absolute; top: 0; right: 0; margin: 30px;">
+    <input type="submit" value="Sair" class="btn btn-primary"/>
+</form>

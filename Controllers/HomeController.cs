@@ -15,20 +15,29 @@ public class HomeController(IUserRepository repository) : Controller
         if (User.Identity.IsAuthenticated)
         {
             UserResponseDTO user = await _repository.FindByNameAsync(User.Identity.Name);
-            return Ok(User.Identity.Name);
+            
+            if (user != null)
+                return View(user);
+            await _repository.SignOutAsync();
         }
-        return NotFound("You're not logged in");
+        return RedirectToAction("Login");
     }
 
     [HttpGet]
     public IActionResult Login()
     {
+        if (User.Identity.IsAuthenticated)
+            return RedirectToAction("Index");
+        
         return View();
     }
 
     [HttpPost]
     public async Task<IActionResult> Login(UserRequestDTO user)
     {
+        if (User.Identity.IsAuthenticated)
+            return RedirectToAction("Index");
+
         if (!ModelState.IsValid)
         {
             TempData["Message"] = ModelState.Values
@@ -44,6 +53,12 @@ public class HomeController(IUserRepository repository) : Controller
             return View();
         }
         return RedirectToAction("Index");
+    }
+
+    [HttpGet]
+    public IActionResult Register()
+    {
+        return View();
     }
 
     [HttpPost]
