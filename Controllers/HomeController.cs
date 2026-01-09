@@ -65,7 +65,13 @@ public class HomeController(IUserRepository repository) : Controller
     public async Task<IActionResult> Register(UserCreateDTO user)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        {
+            TempData["Message"] = ModelState.Values
+                                .SelectMany(v => v.Errors)
+                                .Select(e => e.ErrorMessage)
+                                .ToList()[0];
+            return View();
+        }
         
         var result = await _repository.CreateUserAsync(user);
         if (result.IsSuccess)
