@@ -13,7 +13,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 if (builder.Environment.IsDevelopment())
     builder.Services.AddDbContext<UserDbContext>(options => options.UseInMemoryDatabase("Test"));
 else
-    builder.Services.AddDbContext<UserDbContext>(options => options.UseSqlServer("AZURE_SQL_CONNECTIONSTRING"));
+    builder.Services.AddDbContext<UserDbContext>(options => 
+        options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING")));
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
